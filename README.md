@@ -1,13 +1,14 @@
 
 ## A Paytm app clone with fully functional backend and frontend
 using various languages,frameork and libraries
-##Dashboard
+
+## Dashboard
 ![](dashboard.PNG)
 
-##signin
-![](signin.png)
-##signup
-![](signup.png)
-##transfer money page
-![](send.png)
+## signin
+![](signin.PNG)
+## signup
+![](signup.PNG)
+## transfer money page
+![](send.PNG)
 
