@@ -1,0 +1,32 @@
+{
+  "family": "paytm-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "containerDefinitions": [
+    {
+      "name": "paytm-backend",
+      "image": "031857855591.dkr.ecr.ap-south-1.amazonaws.com/paytm-backend:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "name": "paytm-frontend",
+      "image": "031857855591.dkr.ecr.ap-south-1.amazonaws.com/paytm-frontend:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 5173,
+          "protocol": "tcp"
+        }
+      ]
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::031857855591:role/ecsTaskExecutionRole"
+}

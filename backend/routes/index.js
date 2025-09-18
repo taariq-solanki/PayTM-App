@@ -1,8 +1,9 @@
-const express= require('express');
-const { authMiddleware } = require('../middleware');
+const express = require("express");
+const router = express.Router();
 
-const app=express();
-const mainRouter=new express.Router;
+// Example main route
+router.get("/", (req, res) => {
+  res.json({ message: "Welcome to the main API!" });
+});
 
-
-module.exports=mainRouter;
+module.exports = router;

@@ -1,26 +1,40 @@
-const mongoose=require('mongoose')
+const mongoose = require('mongoose');
 
-const userSchema=mongoose.Schema({
-    username:String,
-    password:String,
-    firstname:String,
-    lastname:String,
+const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/paytm';
+
+mongoose.connect(mongoUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 })
-const userAccountSchema=mongoose.Schema({
-    userId:{type:mongoose.Schema.Types.ObjectId,
-        ref:'User',
+
+.then(() => console.log('✅ Connected to MongoDB'))
+.catch(err => console.error('❌ MongoDB connection error:', err));
+
+// ✅ User schema
+const userSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    firstname: String,
+    lastname: String
+});
+
+// ✅ Account schema
+const userAccountSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
     balance: {
         type: Number,
-        required: true
+        required: true,
+        default: 0
     }
-})
+});
 
-const db=mongoose.connect('mongodb+srv://admin:admin123@cluster0.uvpxgrw.mongodb.net/paytm')
-const User=mongoose.model('User',userSchema)
-const UserAccount=mongoose.model('UserAccount',userAccountSchema)
+// ✅ Models
+const User = mongoose.model('User', userSchema);
+const UserAccount = mongoose.model('UserAccount', userAccountSchema);
 
-
-
-module.exports={User,UserAccount,db}
+// ✅ Export
+module.exports = { User, UserAccount };

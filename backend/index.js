@@ -1,20 +1,43 @@
 const express = require("express");
-const { User } = require("./db");
-const mainRouter = require("./routes");
-const userRouter = require("./routes/user");
-const cors=require('cors')
-const jwt=require("jsonwebtoken");
-const { accountRouter } = require("./routes/account");
+const cors = require("cors");
 
+const mainRouter = require("./routes");          // routes/index.js
+const userRouter = require("./routes/user");     // routes/user.js
+const { accountRouter } = require("./routes/account"); // routes/account.js
 
-const app=express()
+const app = express();
+const PORT = 3000;
 
-
-app.use(cors())
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-app.use('/api/v1',mainRouter)
-app.use('/api/v1/user',userRouter)
-app.use('/api/v1/account',accountRouter)
+// Root route
+app.get("/", (req, res) => {
+  res.send("Backend is running!");
+});
 
-app.listen(3000)
+// Test API route
+app.get("/api/v1/test", (req, res) => {
+  res.json({ message: "API is working!" });
+});
+
+// Register routers
+app.use("/api/v1", mainRouter);
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/account", accountRouter);
+
+// 404 handler
+app.use((req, res, next) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
