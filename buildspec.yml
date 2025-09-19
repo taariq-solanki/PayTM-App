@@ -4,25 +4,23 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 031857855591.dkr.ecr.ap-south-1.amazonaws.com
-      - BACKEND_REPO=031857855591.dkr.ecr.ap-south-1.amazonaws.com/paytm-backend
-      - FRONTEND_REPO=031857855591.dkr.ecr.ap-south-1.amazonaws.com/paytm-frontend
-
+      - aws --version
+      - $(aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 031857855591.dkr.ecr.ap-south-1.amazonaws.com)
+      - REPOSITORY_URI=031857855591.dkr.ecr.ap-south-1.amazonaws.com/paytm-backend
+      - IMAGE_TAG=latest
   build:
     commands:
-      - echo Building Backend...
-      - docker build -t $BACKEND_REPO:latest ./backend
-      - echo Building Frontend...
-      - docker build -t $FRONTEND_REPO:latest ./frontend
-
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG ./backend
   post_build:
     commands:
-      - echo Pushing Backend...
-      - docker push $BACKEND_REPO:latest
-      - echo Pushing Frontend...
-      - docker push $FRONTEND_REPO:latest
-      - echo Writing imagedefinitions.json...
-      - printf '[{"name":"paytm-backend","imageUri":"%s"},{"name":"paytm-frontend","imageUri":"%s"}]' $BACKEND_REPO:latest $FRONTEND_REPO:latest > imagedefinitions.json
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"paytm-container","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 
 artifacts:
-  files: imagedefinitions.json
+  files:
+    - imagedefinitions.json
