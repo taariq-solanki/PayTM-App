@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:5
+    container_name: paytm-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    command: ["--replSet", "rs0"]
+
+  backend:
+    build: ./backend
+    container_name: paytm-backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb+srv://paytmUser:Npy0g2KNFDXo9xHy@paytmcluster.tqln6ay.mongodb.net/paytm?retryWrites=true&w=majority&appName=PaytmCluster
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+      - NODE_ENV=development
+    restart: unless-stopped
+
+  frontend:
+    image: node:20-alpine
+    container_name: paytm-frontend
+    ports:
+      - "5173:5173"
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mongo-data:

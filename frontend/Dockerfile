@@ -1,13 +1,14 @@
 # Build stage
-FROM node:20 AS build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first for better caching
 COPY package*.json ./
 
-# Install dependencies with legacy peer deps to avoid conflicts
-RUN npm install --legacy-peer-deps && npm cache clean --force
+# Install dependencies with optimizations
+RUN npm ci --only=production --silent && \
+    npm cache clean --force
 
 # Copy source code
 COPY . .
