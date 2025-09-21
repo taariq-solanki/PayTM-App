@@ -9,7 +9,7 @@ import { LastNameAtom, emailAtom, firstNameAtom, passwordAtom } from "../atoms/n
 import axios from "axios";
 
 // 👇 replace with your backend Public IP or domain
-const API_BASE_URL = "http://3.6.93.205:3000";
+import { API_BASE_URL } from "../config";
 
 export function SignUp() {
   const [firstName, setFirstName] = useRecoilState(firstNameAtom);
