@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 
-const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/paytm';
+// Use Atlas connection if available, otherwise fallback to local Mongo
+const mongoUrl = process.env.MONGO_URI || 'mongodb://localhost:27017/paytm';
 
 mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => console.error('❌ MongoDB connection error:', err));
 
