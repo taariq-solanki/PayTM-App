@@ -28,24 +28,36 @@ export function Dashboard() {
   }, []);
 
   return (
-    <div className="">
-      <div className=" bg-orange-500 p-1">
-        <div className="shadow-2xl">
-          <Appbar label={firstName + " " + lastName}></Appbar>
-          <div className="border-2 mt-1 h-150 min-h-96 max-h-full bg-gray-100 border-slate-900 p-3 divide-black rounded-xl grid grid-cols-5 divide-x ">
-            <div>
-              <div>
-                <Balance amount={amount}></Balance>
-              </div>
-              <div>
-                <Logout />
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 shadow-lg">
+        <Appbar label={firstName + " " + lastName} />
+      </div>
+      
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+              <Balance amount={amount} />
             </div>
-            <div className="col-span-4 px-2">
-              <div className="pb-3 pt-2 mb-1 px-3 bg-white rounded-lg">
-                <Heading label={"Users"}></Heading>
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <Logout />
+            </div>
+          </div>
+          
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-6">
+                <Heading label="Users" size="lg" />
+                <div className="flex items-center space-x-2 text-gray-500">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                  </svg>
+                  <span className="text-sm">All Users</span>
+                </div>
               </div>
-              <UserCard></UserCard>
+              <UserCard />
             </div>
           </div>
         </div>

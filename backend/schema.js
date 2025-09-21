@@ -1,16 +1,10 @@
-const { model } = require('mongoose')
-const zod=require('zod')
-const userValid =zod.object({
-    username:zod.string().email(),
-    password:zod.string(),
-    firstname:zod.string(),
-    lastname:zod.string(),
+const { z } = require('zod');
 
-})
+const userValid = z.object({
+    username: z.string().email(),
+    password: z.string().min(6),
+    firstname: z.string().min(1),
+    lastname: z.string().min(1)
+});
 
-const transferSchema=zod.object({
-    to:zod.string(),
-    amount:zod.number()
-})
-
-module.exports={userValid,transferSchema}
+module.exports = { userValid };

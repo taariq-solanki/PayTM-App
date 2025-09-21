@@ -1,20 +1,30 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "./buttons";
 
-export function Logout(){
-    const navigate=useNavigate()
-    return <div className="flex flex-col justify-between shadow-lg p-1 mr-3 mt-4 bg-white rounded-lg sticky top-20">
-        
-    <div className="">
-        <button onClick={function(){
-            localStorage.removeItem("token")
-            navigate('/signup')
+export function Logout() {
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate('/signin');
+  };
 
-        }} className="m-2  middle none center w-11/12 rounded-lg bg-orange-500 mx-2 py-3 px-6 font-sans text-xs font-bold uppercase text-white
-     shadow-md shadow-pink-500/20 transition-all hover:shadow-lg hover:shadow-pink-500/40 focus:opacity-[0.85] 
-     focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" >Logout</button>
-        
+  return (
+    <div className="bg-white rounded-xl shadow-lg p-6">
+      <div className="text-center">
+        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">Sign Out</h3>
+        <p className="text-sm text-gray-600 mb-4">Are you sure you want to sign out?</p>
+        <Button
+          label="Sign Out"
+          onClick={handleLogout}
+          variant="danger"
+        />
+      </div>
     </div>
-    
-</div>
+  );
 }

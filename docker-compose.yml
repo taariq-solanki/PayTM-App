@@ -19,14 +19,18 @@ services:
       - mongo
     environment:
       - MONGO_URL=mongodb://mongo:27017/paytm
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+      - NODE_ENV=development
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
     container_name: paytm-frontend
     ports:
-      - "5173:5173"
+      - "80:80"
     depends_on:
       - backend
+    restart: unless-stopped
 
 volumes:
   mongo-data:

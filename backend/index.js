@@ -1,12 +1,13 @@
 const express = require("express");
 const cors = require("cors");
+require('dotenv').config();
 
 const mainRouter = require("./routes");          // routes/index.js
 const userRouter = require("./routes/user");     // routes/user.js
 const { accountRouter } = require("./routes/account"); // routes/account.js
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
@@ -39,5 +40,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
