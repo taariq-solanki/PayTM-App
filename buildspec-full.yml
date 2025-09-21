@@ -1,0 +1,31 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 031857855591.dkr.ecr.ap-south-1.amazonaws.com
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building backend Docker image...
+      - docker build -t paytm-backend ./backend
+      - docker tag paytm-backend:latest 031857855591.dkr.ecr.ap-south-1.amazonaws.com/paytm-backend:latest
+      - echo Building frontend Docker image...
+      - docker build -t paytm-frontend ./frontend
+      - docker tag paytm-frontend:latest 031857855591.dkr.ecr.ap-south-1.amazonaws.com/paytm-frontend:latest
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing Docker images...
+      - docker push 031857855591.dkr.ecr.ap-south-1.amazonaws.com/paytm-backend:latest
+      - docker push 031857855591.dkr.ecr.ap-south-1.amazonaws.com/paytm-frontend:latest
+      - echo Writing image definitions file...
+      - printf '[{"name":"paytm-backend","imageUri":"031857855591.dkr.ecr.ap-south-1.amazonaws.com/paytm-backend:latest"},{"name":"paytm-frontend","imageUri":"031857855591.dkr.ecr.ap-south-1.amazonaws.com/paytm-frontend:latest"}]' > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json

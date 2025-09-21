@@ -26,7 +26,7 @@ userRouter.post('/signup', async (req, res) => {
 
         await UserAccount.create({
             userId: user._id,
-            balance: Math.ceil(Math.random() * 10000)
+            balance: 1000 // Default balance for new users
         });
 
         const token = jwt.sign({ userId: user._id }, jwtSecret);
@@ -38,13 +38,28 @@ userRouter.post('/signup', async (req, res) => {
 
 // Signin
 userRouter.post('/signin', async (req, res) => {
-    const { username, password } = req.body;
-    const existingUser = await User.findOne({ username, password });
-    if (existingUser) {
-        const token = jwt.sign({ userId: existingUser._id }, jwtSecret);
-        return res.status(200).json({ token, msg: "signin done" });
+    try {
+        const { username, password } = req.body;
+        const existingUser = await User.findOne({ username, password });
+        if (existingUser) {
+            // Ensure user has an account
+            let account = await UserAccount.findOne({ userId: existingUser._id });
+            if (!account) {
+                // Create account if it doesn't exist
+                account = await UserAccount.create({
+                    userId: existingUser._id,
+                    balance: 1000 // Default balance for new accounts
+                });
+            }
+            
+            const token = jwt.sign({ userId: existingUser._id }, jwtSecret);
+            return res.status(200).json({ token, msg: "signin done" });
+        }
+        res.status(411).json({ msg: "error while logging in" });
+    } catch (error) {
+        console.error('Signin error:', error);
+        res.status(500).json({ msg: "something went wrong" });
     }
-    res.status(411).json({ msg: "error while logging in" });
 });
 
 // Update user

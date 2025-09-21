@@ -14,6 +14,20 @@
           "containerPort": 3000,
           "protocol": "tcp"
         }
+      ],
+      "environment": [
+        {
+          "name": "MONGO_URI",
+          "value": "mongodb+srv://paytmUser:Npy0g2KNFDXo9xHy@paytmcluster.tqln6ay.mongodb.net/paytm?retryWrites=true&w=majority&appName=PaytmCluster"
+        },
+        {
+          "name": "JWT_SECRET",
+          "value": "your-super-secret-jwt-key-change-this-in-production"
+        },
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        }
       ]
     },
     {

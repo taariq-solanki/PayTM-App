@@ -24,10 +24,12 @@ services:
     restart: unless-stopped
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.simple
     container_name: paytm-frontend
     ports:
-      - "80:80"
+      - "5173:5173"
     depends_on:
       - backend
     restart: unless-stopped
