@@ -37,63 +37,87 @@ accountRouter.get('/balance', authMiddleware, async (req, res) => {
     }
 });
 
-// Transfer money
+// Transfer money - SIMPLIFIED VERSION
 accountRouter.post('/transfer', authMiddleware, async (req, res) => {
     try {
-        const transferInfo = req.body;
+        const { to, amount } = req.body;
+        
+        console.log('=== TRANSFER REQUEST ===');
+        console.log('From user ID:', req.userId);
+        console.log('To:', to);
+        console.log('Amount:', amount);
         
         // Validate input
-        if (!transferInfo.to || !transferInfo.amount) {
+        if (!to || !amount) {
             return res.status(400).json({ msg: "missing required fields" });
         }
 
-        const session = await mongoose.startSession();
-        session.startTransaction();
-
-        // Find receiver by username (email)
-        console.log('Looking for recipient:', transferInfo.to);
-        const receiver = await User.findOne({ username: transferInfo.to }).session(session);
-        console.log('Receiver found:', receiver ? 'Yes' : 'No');
+        // Find receiver by username
+        console.log('Looking for receiver with username:', to);
+        const receiver = await User.findOne({ username: to });
+        console.log('Receiver found:', receiver ? 'YES' : 'NO');
         
         if (!receiver) {
-            await session.abortTransaction();
-            return res.json({ msg: "recipient not found" });
+            // Show all available users for debugging
+            const allUsers = await User.find({}, 'username firstname lastname');
+            console.log('Available users:', allUsers.map(u => u.username));
+            return res.json({ 
+                msg: "recipient not found", 
+                availableUsers: allUsers.map(u => u.username) 
+            });
         }
 
-        // Find or create receiver account
-        let receiverStatus = await UserAccount.findOne({ userId: receiver._id }).session(session);
-        if (!receiverStatus) {
-            // Create account for receiver if it doesn't exist
-            receiverStatus = await UserAccount.create([{
-                userId: receiver._id,
-                balance: 1000 // Default balance for new accounts
-            }], { session });
-            receiverStatus = receiverStatus[0];
-        }
-
-        // Find or create sender account
-        let senderStatus = await UserAccount.findOne({ userId: req.userId }).session(session);
-        if (!senderStatus) {
-            // Create account for sender if it doesn't exist
-            senderStatus = await UserAccount.create([{
+        // Get or create sender account
+        let senderAccount = await UserAccount.findOne({ userId: req.userId });
+        if (!senderAccount) {
+            senderAccount = await UserAccount.create({
                 userId: req.userId,
-                balance: 1000 // Default balance for new accounts
-            }], { session });
-            senderStatus = senderStatus[0];
-        }
-        if (senderStatus.balance < transferInfo.amount) {
-            await session.abortTransaction();
-            return res.json({ msg: "insufficient balance" });
+                balance: 1000
+            });
+            console.log('Created sender account with balance:', senderAccount.balance);
         }
 
-        await UserAccount.updateOne({ userId: req.userId }, { $inc: { balance: -transferInfo.amount } }).session(session);
-        await UserAccount.updateOne({ userId: receiver._id }, { $inc: { balance: transferInfo.amount } }).session(session);
+        // Get or create receiver account
+        let receiverAccount = await UserAccount.findOne({ userId: receiver._id });
+        if (!receiverAccount) {
+            receiverAccount = await UserAccount.create({
+                userId: receiver._id,
+                balance: 1000
+            });
+            console.log('Created receiver account with balance:', receiverAccount.balance);
+        }
 
-        await session.commitTransaction();
-        res.json({ msg: "transaction successful" });
+        // Check if sender has enough balance
+        if (senderAccount.balance < amount) {
+            return res.json({ 
+                msg: "insufficient balance", 
+                currentBalance: senderAccount.balance,
+                requestedAmount: amount 
+            });
+        }
+
+        // Perform the transfer
+        await UserAccount.updateOne(
+            { userId: req.userId }, 
+            { $inc: { balance: -amount } }
+        );
+        
+        await UserAccount.updateOne(
+            { userId: receiver._id }, 
+            { $inc: { balance: amount } }
+        );
+
+        console.log('Transfer successful!');
+        res.json({ 
+            msg: "transaction successful",
+            from: req.userId,
+            to: receiver.username,
+            amount: amount
+        });
+
     } catch (error) {
         console.error('Transfer error:', error);
-        res.status(500).json({ msg: "something went wrong" });
+        res.status(500).json({ msg: "something went wrong", error: error.message });
     }
 });
 
@@ -120,6 +144,38 @@ accountRouter.get('/debug/user/:username', async (req, res) => {
             found: !!user, 
             user: user ? { username: user.username, firstname: user.firstname, lastname: user.lastname } : null 
         });
+    } catch (error) {
+        console.error('Debug error:', error);
+        res.status(500).json({ msg: "something went wrong" });
+    }
+});
+
+// Test endpoint to create test users (remove in production)
+accountRouter.post('/debug/create-test-users', async (req, res) => {
+    try {
+        // Create test users
+        const testUsers = [
+            { username: 'test1@example.com', password: 'password123', firstname: 'Test', lastname: 'User1' },
+            { username: 'test2@example.com', password: 'password123', firstname: 'Test', lastname: 'User2' }
+        ];
+
+        const createdUsers = [];
+        for (const userData of testUsers) {
+            // Check if user already exists
+            let user = await User.findOne({ username: userData.username });
+            if (!user) {
+                user = await User.create(userData);
+                await UserAccount.create({
+                    userId: user._id,
+                    balance: 1000
+                });
+                createdUsers.push({ username: user.username, created: true });
+            } else {
+                createdUsers.push({ username: user.username, created: false, message: 'already exists' });
+            }
+        }
+
+        res.json({ message: 'Test users created', users: createdUsers });
     } catch (error) {
         console.error('Debug error:', error);
         res.status(500).json({ msg: "something went wrong" });

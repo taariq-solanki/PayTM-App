@@ -1,4 +1,5 @@
 export function Message({ type, message, onClose }) {
+    
   if (!message) return null;
 
   const baseClasses = "p-4 rounded-lg mb-4 flex items-center justify-between";

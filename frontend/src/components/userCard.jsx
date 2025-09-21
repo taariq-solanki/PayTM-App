@@ -6,6 +6,7 @@ import axios from "axios";
 import { userAtom } from "../atoms/users";
 import { useNavigate } from "react-router-dom";
 import { sendAmountAtom, toAtom } from "../atoms/transaction";
+import { API_BASE_URL } from "../config";
 
 
 export function UserCard(){
@@ -18,7 +19,7 @@ export function UserCard(){
         async function res(){
          const response=await axios({
              method:"GET",
-             url:"http://localhost:3000/api/v1/user/bulk?filter="+filter
+             url:`${API_BASE_URL}/api/v1/user/bulk?filter=${filter}`
          })
          setUsers(response.data.users)
          console.log(users)
@@ -38,7 +39,7 @@ export function UserCard(){
             // //console.log(i._id)
             // console.log(to)
 
-            navigate('/send?to='+i._id+"&name="+i.firstname)
+            navigate('/send?to='+i.username+"&name="+i.firstname)
            }}></UserComponent>
         })}
         
