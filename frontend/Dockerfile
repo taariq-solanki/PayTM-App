@@ -33,9 +33,10 @@ RUN chown -R nginx:nginx /usr/share/nginx/html && \
     chown -R nginx:nginx /var/log/nginx && \
     chown -R nginx:nginx /etc/nginx/conf.d
 
-# Create nginx pid directory
+# Create nginx pid directory and configure nginx to use it
 RUN mkdir -p /var/run/nginx && \
-    chown -R nginx:nginx /var/run/nginx
+    chown -R nginx:nginx /var/run/nginx && \
+    sed -i 's|pid /run/nginx.pid;|pid /var/run/nginx/nginx.pid;|' /etc/nginx/nginx.conf
 
 # Switch to non-root user
 USER nginx
